@@ -19,3 +19,15 @@ start:
 .PHONY: test
 test:
 	go test -v -p 1 -count 1 -race ./...
+
+.PHONY: tf-init
+tf-init:
+	cd contrib/terraform && terraform init
+
+.PHONY: tf-apply
+tf-apply:
+	cd contrib/terraform && terraform apply
+
+.PHONY: start-vault
+start-vault:
+	vault server -dev
