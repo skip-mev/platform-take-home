@@ -1,19 +1,29 @@
-# Skip Platform Engineer - take home exercise
+# Skip Platform Engineer - take home
 
 ## Background
 
-🎯 **Goal:** Create a basic remote signing service that uses the Vault Transit Engine as a secure key-store
+> 🎯 **Goal:** Create a basic remote data signing service that uses the Vault Transit Engine as a secure key-store
+
+You can fork this repo to use as a template for the take-home.
 
 ## Outline
 
-Our services depend on interacting with the chains, not only querying them, but also submitting transactions from Skip wallets. We want to be assured that the backing material for these wallets (private keys) do not get exposed publicly or even Skip employees. This is possible to accomplish with a remote signing service. The remote signing service for the sake of this exercise should be pretty basic - allowing to create wallets on the Cosmos Hub, return their public keys and sign transaction bytes.
+Our products interact with dozens of blockchains, including signing and submitting transactions to them. We want to be assured that the backing material for these wallets (secp256k1/r1 private keys) do not get exposed publicly or even to Skip employees. 
+
+This is possible to accomplish with a remote signing service. The remote signing service for the sake of this exercise needs to support three basic operations: 
+
+1.  Create a private/public key pair and address on the Cosmos Hub
+2. Query a public key
+3. Sign transaction bytes
+
+The service should use Vault Transit Engine to store the keys securely at rest. 
 
 ## Requirements
 
 ### Features
 
-1. Creating a wallet associated with a secp256r1 key
-2. Returning wallets created by the service
+1. Create a Secp256r1 public/private key pair
+2. Returning public keys created by the service
 3. Signing bytes with the private key associated to the wallet
 
 ### API structure
@@ -33,18 +43,12 @@ There are requirements to how the local Vault instance should be configured. You
 
 To ensure your service passes basic functionality tests, you can run `make test` in the root directory of the service template. This will test your API for basic functionality such as creating a wallet, getting all wallets from the API and validating a signature signed by the service.
 
-## Helpers
-
-To help you with the boilerplate, there's already an API server with the correct typing set up in `api/server/api_server.go`. None of the methods are implemented correctly and you should do so according to the requirements.
-
-To start the server you can run `make start` and in another window you can run `make test` to test the correctness of your API.
-
 ## Specific things we’re looking for
 
+1. Familiarity with (or ability to quickly learn) infrastructure-as-code platform such as a Terraform or similar
+2. Familiarity with (or ability to quickly learn) core components of our platform stack, including Vault, Make, etc…
+3. Ability to handle complex problems that stretch across traditional backend services, blockchain transactions/queries, and cloud infrastructure
+4. Capacity to design systems that are readable, extensible, and functional & adhere to reasonable software design principles
 
-<aside>
-🆘 Please reach out to us on Telegram (@bpiv400, @magelinskaas) or email (barry@skip.money, zygis@skip.money) if you have any questions.
+> 🆘 Please reach out to us on Telegram (@bpiv400, @magelinskaas) or email (barry@skip.money, zygis@skip.money) if you have any questions.
 
-</aside>
-
-###
