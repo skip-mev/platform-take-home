@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+option go_package = "github.com/skip-mev/platform-take-home/types";
+
+package skip_mev.signing;
+
+import "google/api/annotations.proto";
+
+service API {
+    rpc CreateWallet(CreateWalletRequest) returns (CreateWalletResponse) {
+        option (google.api.http) = {
+            post: "/wallet"
+            body: "*"
+        };
+    }
+
+    rpc GetWallet(GetWalletRequest) returns (GetWalletResponse) {
+        option (google.api.http) = {
+            get: "/wallet/{name}"
+        };
+    }
+
+    rpc GetWallets(EmptyRequest) returns (GetWalletsResponse) {
+        option (google.api.http) = {
+            get: "/wallet"
+        };
+    }
+
+    rpc Sign(WalletSignatureRequest) returns (WalletSignatureResponse) {
+        option (google.api.http) = {
+            post: "/sign",
+            body: "*"
+        };
+    }
+}
+
+message Wallet {
+    string name = 1;
+    bytes pubkey = 2;
+    bytes address_bytes = 3;
+    string address = 4;
+}
+
+message CreateWalletRequest {
+    string name = 1;
+}
+
+message CreateWalletResponse {
+    Wallet wallet = 1;
+    Error error = 2;
+}
+
+message GetWalletRequest {
+    string name = 1;
+}
+
+message GetWalletResponse {
+    Wallet wallet = 1;
+    Error error = 2;
+}
+
+message GetWalletsResponse {
+    repeated Wallet wallets = 1;
+    Error error = 2;
+}
+
+message WalletSignatureRequest {
+    string wallet_name = 1;
+    bytes tx_bytes = 2;
+}
+
+message WalletSignatureResponse {
+    bytes signature = 1;
+    Error error = 2;
+}
+
+message Error {
+    string message = 1;
+}
+
+message EmptyRequest {}
