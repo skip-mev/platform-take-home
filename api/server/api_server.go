@@ -2,22 +2,15 @@ package server
 
 import (
 	"context"
-	"crypto/ecdsa"
-	"crypto/elliptic"
 	"crypto/sha256"
-	"encoding/asn1"
 	"encoding/base64"
-	"encoding/hex"
 	"encoding/pem"
 	"fmt"
 	"strings"
 
-	"math/big"
-
 	"github.com/hashicorp/vault/api"
 	"github.com/skip-mev/platform-take-home/logging"
 	"go.uber.org/zap"
-	"golang.org/x/crypto/ripemd160"
 
 	"github.com/skip-mev/platform-take-home/types"
 
@@ -58,33 +51,9 @@ func NewDefaultAPIServer(vaultAddr string) *APIServerImpl {
 	}
 }
 
-func publicKeyToAddress(pubKey *ecdsa.PublicKey) (string, []byte) {
-	if pubKey == nil {
-		return "", nil
-	}
-
-	pubKeyBytes := elliptic.Marshal(pubKey.Curve, pubKey.X, pubKey.Y)
-	if pubKeyBytes == nil {
-		return "", nil
-	}
-
-	// Hash the public key to compute the address
-	hash := sha256.New()
-	hash.Write(pubKeyBytes[1:]) // Remove the 0x04 prefix if present
-	publicSHA256 := hash.Sum(nil)
-
-	ripemd160Hasher := ripemd160.New()
-	ripemd160Hasher.Write(publicSHA256)
-	publicRIPEMD160 := ripemd160Hasher.Sum(nil)
-
-	addressBytes := publicRIPEMD160[len(publicRIPEMD160)-20:] // Take the last 20 bytes
-
-	// Convert to hex, skipping the "0x" prefix
-	address := hex.EncodeToString(addressBytes)
-
-	return address, addressBytes
-}
-
+// CreateWallet handles the creation of a new wallet by interacting with Vault's transit secrets engine.
+// It generates a new ECDSA key, stores it, and returns the wallet's public key and address in a Bech32 format.
+// The method ensures that wallet names are unique and not empty.
 func (s *APIServerImpl) CreateWallet(ctx context.Context, request *types.CreateWalletRequest) (*types.CreateWalletResponse, error) {
 	logging.FromContext(ctx).Info("CreateWallet", zap.String("name", request.Name))
 
@@ -225,6 +194,9 @@ func (s *APIServerImpl) CreateWallet(ctx context.Context, request *types.CreateW
 	}, nil
 }
 
+// GetWallet retrieves a specific wallet by name, confirming its existence and fetching the public key from Vault.
+// The response includes the public key and the Bech32 address of the wallet.
+// This method ensures the wallet name is not empty and handles errors related to data retrieval from Vault.
 func (s *APIServerImpl) GetWallet(ctx context.Context, request *types.GetWalletRequest) (*types.GetWalletResponse, error) {
 	logging.FromContext(ctx).Info("GetWallet", zap.String("name", request.Name))
 
@@ -346,13 +318,14 @@ func (s *APIServerImpl) GetWallet(ctx context.Context, request *types.GetWalletR
 	}, nil
 }
 
+// GetWallets compiles a list of all wallets stored in memory and retrieves their details using the GetWallet method.
+// If any errors are encountered during wallet retrieval, the method logs these and may return an error message indicating no wallets could be retrieved.
 func (s *APIServerImpl) GetWallets(ctx context.Context, request *types.EmptyRequest) (*types.GetWalletsResponse, error) {
 	logging.FromContext(ctx).Info("GetWallets")
 
 	var wallets []*types.Wallet
 	var errorsEncountered bool
 
-	// Iterate through all wallet names stored in memory
 	for _, name := range s.walletNames {
 		// Use the GetWallet method to fetch each wallet by its name
 		response, err := s.GetWallet(ctx, &types.GetWalletRequest{Name: name})
@@ -384,20 +357,9 @@ func (s *APIServerImpl) GetWallets(ctx context.Context, request *types.EmptyRequ
 	}, nil
 }
 
-func HexToBech32(hexAddr string, prefix string) (string, error) {
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(prefix, prefix+"pub")
-
-	addrBytes, err := hex.DecodeString(hexAddr)
-	if err != nil {
-		return "", fmt.Errorf("failed to decode hex address: %w", err)
-	}
-
-	address := sdk.AccAddress(addrBytes)
-
-	return address.String(), nil
-}
-
+// Sign uses Vault's transit secrets engine to sign transaction bytes provided in the request.
+// It ensures the wallet name is not empty, encodes the transaction bytes, and attempts to retrieve the signature from Vault.
+// The method handles and logs any errors encountered during the signing process and returns the signature in raw format.
 func (s *APIServerImpl) Sign(ctx context.Context, request *types.WalletSignatureRequest) (*types.WalletSignatureResponse, error) {
 	logging.FromContext(ctx).Info("Signing transaction", zap.String("wallet_name", request.WalletName), zap.ByteString("tx_bytes", request.TxBytes))
 
@@ -458,7 +420,7 @@ func (s *APIServerImpl) Sign(ctx context.Context, request *types.WalletSignature
 	}
 
 	// Decode DER signature to get R and S
-	ecdsaSig, err := decodeDERSignature(signatureBytes)
+	ecdsaSig, err := DecodeDERSignature(signatureBytes)
 	if err != nil {
 		s.logger.Error("failed to decode DER signature", zap.Error(err))
 		return &types.WalletSignatureResponse{
@@ -486,17 +448,4 @@ func (s *APIServerImpl) Sign(ctx context.Context, request *types.WalletSignature
 	return &types.WalletSignatureResponse{
 		Signature: rawSig,
 	}, nil
-}
-
-type ECDSASignature struct {
-	R, S *big.Int
-}
-
-func decodeDERSignature(der []byte) (*ECDSASignature, error) {
-	var sig ECDSASignature
-	_, err := asn1.Unmarshal(der, &sig)
-	if err != nil {
-		return nil, err
-	}
-	return &sig, nil
 }

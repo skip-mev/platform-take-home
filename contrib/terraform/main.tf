@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     vault = {
-      source = "hashicorp/vault"
+      source  = "hashicorp/vault"
       version = "3.24.0"
     }
   }
@@ -43,9 +43,9 @@ resource "vault_approle_auth_backend_role" "app_role" {
   backend        = vault_auth_backend.approle.path
   role_name      = "app_role"
   token_policies = [vault_policy.app_role_policy.name]
-  
-  token_ttl     = 3600   # 1 hour in seconds
-  token_max_ttl = 14400  # 4 hours in seconds
+
+  token_ttl     = 3600  # 1 hour in seconds
+  token_max_ttl = 14400 # 4 hours in seconds
 }
 
 resource "vault_mount" "transit" {
