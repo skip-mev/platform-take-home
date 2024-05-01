@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"os"
 
 	apiserver "github.com/skip-mev/platform-take-home/api/server"
 	"github.com/skip-mev/platform-take-home/logging"
@@ -14,31 +15,40 @@ import (
 )
 
 func startGRPCServer(ctx context.Context, host string, port int) error {
-	loggingInterceptor := logging.UnaryServerInterceptor(logging.FromContext(ctx))
+	logger := logging.FromContext(ctx) // Use the logger extracted from context
+	vaultAddr := os.Getenv("VAULT_ADDR")
+	if vaultAddr == "" {
+		logger.Error("Vault address is not set")
+		return fmt.Errorf("vault address not set")
+	}
 
+	loggingInterceptor := logging.UnaryServerInterceptor(logger)
 	server := grpc.NewServer(grpc.UnaryInterceptor(loggingInterceptor))
 
-	types.RegisterAPIServer(server, apiserver.NewDefaultAPIServer(logging.FromContext(ctx)))
+	// Create the API server instance with the vault address
+	apiServer := apiserver.NewDefaultAPIServer(vaultAddr)
+	types.RegisterAPIServer(server, apiServer)
 
 	reflection.Register(server)
 
 	go func() {
 		<-ctx.Done()
-		logging.FromContext(ctx).Info("[grpc server] terminating...")
+		logger.Info("[grpc server] terminating...")
 		server.GracefulStop()
 	}()
 
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", host, port))
 	if err != nil {
+		logger.Error("[grpc server] error creating listener", zap.Error(err))
 		return fmt.Errorf("[grpc server] error creating listener: %v", err)
 	}
 
-	logging.FromContext(ctx).Info("[grpc server] listening", zap.String("addr", fmt.Sprintf("http://%s", listener.Addr())))
-
+	logger.Info("[grpc server] listening", zap.String("addr", fmt.Sprintf("http://%s", listener.Addr())))
 	if err := server.Serve(listener); err != nil {
+		logger.Error("[grpc server] error serving", zap.Error(err))
 		return fmt.Errorf("[grpc server] error serving: %v", err)
 	}
-	logging.FromContext(ctx).Info("[grpc server] terminated")
 
+	logger.Info("[grpc server] terminated")
 	return nil
 }

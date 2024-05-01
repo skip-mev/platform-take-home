@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/skip-mev/platform-take-home/types"
 	"io"
 	"net/http"
 	"testing"
+
+	"github.com/skip-mev/platform-take-home/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -195,7 +196,7 @@ func TestGetWallets(t *testing.T) {
 		t.Fatalf("expected address %s, got empty", wallet.Address)
 	}
 
-	if ourWallet.Address == wallet.Address {
+	if ourWallet.Address != wallet.Address {
 		t.Fatalf("expected address %s, got %s", wallet.Address, ourWallet.Address)
 	}
 
@@ -276,7 +277,7 @@ func TestSignature(t *testing.T) {
 
 	pk := pubKeyFromBytes(wallet.Pubkey)
 
-	verification := VerifySignature(pk, txBytes, signatureResponse.Signature)
+	verification := VerifySignature(*pk, txBytes, signatureResponse.Signature)
 
 	if !verification {
 		t.Fatalf("expected signature verification, got false")

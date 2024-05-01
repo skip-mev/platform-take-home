@@ -19,6 +19,8 @@ const (
 )
 
 func main() {
+	loadEnv()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

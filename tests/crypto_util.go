@@ -4,16 +4,22 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/sha256"
+	"crypto/x509"
+	"fmt"
 	"math/big"
 )
 
-func pubKeyFromBytes(bz []byte) ecdsa.PublicKey {
-	x, y := elliptic.UnmarshalCompressed(elliptic.P256(), bz)
+func pubKeyFromBytes(bz []byte) *ecdsa.PublicKey {
+	pubKeyInterface, err := x509.ParsePKIXPublicKey(bz)
+	if err != nil {
+		fmt.Println("Error parsing public key:", err)
+		return nil
+	}
 
-	pk := ecdsa.PublicKey{
-		Curve: elliptic.P256(),
-		X:     x,
-		Y:     y,
+	pk, ok := pubKeyInterface.(*ecdsa.PublicKey)
+	if !ok {
+		fmt.Println("Not an ECDSA public key")
+		return nil
 	}
 
 	return pk

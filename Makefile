@@ -31,3 +31,10 @@ tf-apply:
 .PHONY: start-vault
 start-vault:
 	vault server -dev
+
+.PHONY: stop
+stop:
+	@echo "Stopping services..."
+	-@pkill -f "vault server -dev"
+	-@docker-compose -f $(DOCKER_COMPOSE_FILE) down
+	@echo "Services stopped."
