@@ -37,7 +37,7 @@ service API {
 message Wallet {
     string name = 1;
     bytes pubkey = 2;
-    bytes address_bytes = 3;
+    bytes addressBytes = 3;
     string address = 4;
 }
 
