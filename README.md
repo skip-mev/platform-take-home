@@ -1,4 +1,4 @@
-# (INTERNAL - DO NOT USE) Skip Platform Take Home Challenge
+# Skip Platform Take Home Challenge
 
 ## Overview
 
