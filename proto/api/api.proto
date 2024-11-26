@@ -1,81 +1,54 @@
 syntax = "proto3";
 
-option go_package = "github.com/skip-mev/platform-take-home/types";
-
-package skip_mev.signing;
+package skip.platform.api;
 
 import "google/api/annotations.proto";
 
-service API {
-    rpc CreateWallet(CreateWalletRequest) returns (CreateWalletResponse) {
-        option (google.api.http) = {
-            post: "/wallet"
-            body: "*"
-        };
-    }
+option go_package = "github.com/skip-mev/platform-take-home/api/types";
 
-    rpc GetWallet(GetWalletRequest) returns (GetWalletResponse) {
-        option (google.api.http) = {
-            get: "/wallet/{name}"
-        };
-    }
-
-    rpc GetWallets(EmptyRequest) returns (GetWalletsResponse) {
-        option (google.api.http) = {
-            get: "/wallet"
-        };
-    }
-
-    rpc Sign(WalletSignatureRequest) returns (WalletSignatureResponse) {
-        option (google.api.http) = {
-            post: "/sign",
-            body: "*"
-        };
-    }
-}
-
-message Wallet {
-    string name = 1;
-    bytes pubkey = 2;
-    bytes address_bytes = 3;
-    string address = 4;
-}
-
-message CreateWalletRequest {
-    string name = 1;
-}
-
-message CreateWalletResponse {
-    Wallet wallet = 1;
-    Error error = 2;
-}
-
-message GetWalletRequest {
-    string name = 1;
-}
-
-message GetWalletResponse {
-    Wallet wallet = 1;
-    Error error = 2;
-}
-
-message GetWalletsResponse {
-    repeated Wallet wallets = 1;
-    Error error = 2;
-}
-
-message WalletSignatureRequest {
-    string wallet_name = 1;
-    bytes tx_bytes = 2;
-}
-
-message WalletSignatureResponse {
-    bytes signature = 1;
-    Error error = 2;
-}
-
-message Error {
-    string message = 1;
+service TakeHomeService {
+  rpc GetItems(EmptyRequest) returns (GetItemsResponse) {
+    option (google.api.http) = {
+      get: "/items"
+    };
+  };
+  rpc GetItem(GetItemRequest) returns (GetItemResponse) {
+    option (google.api.http) = {
+      get: "/items/{id}"
+    };
+  };
+  rpc CreateItem(CreateItemRequest) returns (CreateItemResponse) {
+    option (google.api.http) = {
+      post: "/items"
+      body: "*"
+    };
+  };
 }
 
 message EmptyRequest {}
+
+message GetItemsResponse {
+  repeated Item items = 1;
+}
+
+message GetItemRequest {
+  uint64 id = 1;
+}
+
+message GetItemResponse {
+  Item item = 1;
+}
+
+message CreateItemRequest {
+  Item item = 1;
+}
+
+message CreateItemResponse {
+  uint64 item_id = 1;
+}
+
+message Item {
+  uint64 id = 1;
+  string name = 2;
+  string description = 3;
+}

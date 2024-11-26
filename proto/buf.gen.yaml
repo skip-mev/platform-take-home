@@ -6,3 +6,5 @@ plugins:
     out: .
   - name: grpc-gateway
     out: .
+  - name: go-grpc-mock
+    out: .

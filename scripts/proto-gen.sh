@@ -9,6 +9,12 @@ for dir in $proto_dirs; do
   done
 done
 
+# Generate external protocol buffers
+# echo "Generating cosmwasm protos"
+# buf generate buf.build/cosmwasm/wasmd
+
+rm -r ../api/types
+mv github.com/skip-mev/platform-take-home/api/types ../api
+rm -r github.com
+
 # move proto files to the right places
-cp -R github.com/skip-mev/platform-take-home/types ../
-rm -rf github.com

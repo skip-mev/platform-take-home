@@ -1,54 +1,50 @@
-# Skip Platform Engineer - take home
+# (INTERNAL - DO NOT USE) Skip Platform Take Home Challenge
 
-## Background
+## Overview
 
-> 🎯 **Goal:** Create a basic remote data signing service that uses the Vault Transit Engine as a secure key-store
+The goal of this exercise will be to demonstrate your DevOps / automation skills. In this repo you will find
+an application that is a simple REST API that returns a list of items. The application is written in Go and 
+uses a Postgres database.
 
-You can fork this repo to use as a template for the take-home.
+## Exercise
 
-## Outline
+Hypothetical developers have been working on this application for a while now and have noticed that the experience 
+is not ideal.
 
-Our products interact with dozens of blockchains, including signing and submitting transactions to them. We want to be assured that the backing material for these wallets (secp256k1/r1 private keys) do not get exposed publicly or even to Skip employees. 
+Their current process is building the binary locally and then deploying it to a server. They have to manually
+configure the database and the application. They have to manually start the application and make sure it is running.
 
-This is possible to accomplish with a remote signing service. The remote signing service for the sake of this exercise needs to support three basic operations: 
+Currently, their main complaints are:
+* the deployment process is manual and error-prone. Whenever a deployment happens, we suffer a tiny bit of downtime due to the server being down.
+* there's no standardization for code formatting which leads to inconsistencies
+* the proto-gen script is ran locally which leads to developers forgetting to do it before pushing code upstream
+* downloading the tooling dependencies is a manual, undocumented process
+* running the server locally is a bit of a pain, since it requires manually standing up a Postgres database (to replicate prod)
+* there's no easy way to share a feature update with our colleagues, since we only have a local and production environment.
 
-1.  Create a private/public key pair and address on the Cosmos Hub
-2. Query a public key
-3. Sign transaction bytes
+Your task is to actionize these complaints and implement features that will make the developers' lives easier.
+You should target about 4-6 hours of work for this exercise. You have the freedom to implement any features you think
+will make the developers' lives easier, as long as you can justify them. Additionally, you do not have to alleviate all
+of the problems above, as long as you reason why you prioritized certain ones versus others.
 
-The service should use Vault Transit Engine to store the keys securely at rest. 
+Lastly, below you will see the tech stack that Skip uses, but you are not constrained to using it. You can use any
+technology you think is best for the job (brownie points for pragmatic creativity).
 
-## Requirements
+## Skip's tech stack
 
-### Features
+At Skip, we use the following technologies:
+* Go for backend and on-chain services
+* Typescript for frontend
+* Postgres for databases
+* Docker + Kubernetes for container orchestration
+* ArgoCD and Github Workflows for continuous, self-service app deployment
 
-1. Create a Secp256r1 public/private key pair
-2. Returning public keys created by the service
-3. Signing bytes with the private key associated to the wallet
+## Deliverables
 
-### API structure
+With the link to the take-home, you also should've received a link for submission. 
+Please invite @Zygimantass and @bpiv400 to the Github repository and submit the repository in the given link.
+In the README, please provide instructions on how to run your solution (whether locally or in cloud).
 
-The API structure is defined in Protobuf in the given code template. You should not modify the API structure as the given tests depend on the API requests and response being constant.
+A short explainer on your solution is also appreciated, but not required.
 
-### Vault security
-
-There are requirements to how the local Vault instance should be configured. You can use whichever infrastructure-as-code tool you feel most comfortable with to do this. The requirements for the Vault configuration are as such:
-
-- There should be an app role that can only interact with the transit engine
-- The app role should be the only one (aside from the root user) that can create, read, update the private keys
-- The private keys should not be exportable or deletable by the app role.
-- The remote signing service should communicate with Vault authenticated as the app role.
-
-### Running tests
-
-To ensure your service passes basic functionality tests, you can run `make test` in the root directory of the service template. This will test your API for basic functionality such as creating a wallet, getting all wallets from the API and validating a signature signed by the service.
-
-## Specific things we’re looking for
-
-1. Familiarity with (or ability to quickly learn) infrastructure-as-code platform such as a Terraform or similar
-2. Familiarity with (or ability to quickly learn) core components of our platform stack, including Vault, Make, etc…
-3. Ability to handle complex problems that stretch across traditional backend services, blockchain transactions/queries, and cloud infrastructure
-4. Capacity to design systems that are readable, extensible, and functional & adhere to reasonable software design principles
-
-> 🆘 Please reach out to us on Telegram (@bpiv400, @magelinskaas) or email (barry@skip.money, zygis@skip.money) if you have any questions.
 
