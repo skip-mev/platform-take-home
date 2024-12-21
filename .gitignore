@@ -2,3 +2,4 @@
 build
 **/.terraform
 **/terraform.tfstate
+.env.local
