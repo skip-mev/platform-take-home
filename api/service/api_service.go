@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+
 	"github.com/skip-mev/platform-take-home/api/types"
 	"github.com/skip-mev/platform-take-home/observability/logging"
 	"github.com/skip-mev/platform-take-home/store"

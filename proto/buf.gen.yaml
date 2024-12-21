@@ -1,10 +1,15 @@
 version: v1
+managed:
+  enabled: true
+  go_package_prefix:
+    default: github.com/skip-mev/platform-take-home/api/types
 plugins:
-  - name: go
+  - plugin: buf.build/protocolbuffers/go
     out: .
-  - name: go-grpc
+    opt: paths=source_relative
+  - plugin: buf.build/grpc/go
     out: .
-  - name: grpc-gateway
+    opt: paths=source_relative
+  - plugin: buf.build/grpc-ecosystem/gateway
     out: .
-  - name: go-grpc-mock
-    out: .
+    opt: paths=source_relative

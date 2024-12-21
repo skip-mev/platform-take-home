@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: platform-service
+spec:
+  replicas: 2  # For zero-downtime deployments
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: platform-service
+  template:
+    metadata:
+      labels:
+        app: platform-service
+    spec:
+      containers:
+      - name: platform-service
+        image: platform-service:latest
+        ports:
+        - containerPort: 8080
+        - containerPort: 9008
+        - containerPort: 8081
+        env:
+        - name: POSTGRES_DSN
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: dsn
+        readinessProbe:
+          httpGet:
+            path: /items
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10

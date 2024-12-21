@@ -2,12 +2,13 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             (unknown)
-// source: api/api.proto
+// source: api.proto
 
 package types
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,9 +20,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TakeHomeService_GetItems_FullMethodName   = "/skip.platform.api.TakeHomeService/GetItems"
-	TakeHomeService_GetItem_FullMethodName    = "/skip.platform.api.TakeHomeService/GetItem"
-	TakeHomeService_CreateItem_FullMethodName = "/skip.platform.api.TakeHomeService/CreateItem"
+	TakeHomeService_GetItems_FullMethodName   = "/api.TakeHomeService/GetItems"
+	TakeHomeService_GetItem_FullMethodName    = "/api.TakeHomeService/GetItem"
+	TakeHomeService_CreateItem_FullMethodName = "/api.TakeHomeService/CreateItem"
 )
 
 // TakeHomeServiceClient is the client API for TakeHomeService service.
@@ -176,7 +177,7 @@ func _TakeHomeService_CreateItem_Handler(srv interface{}, ctx context.Context, d
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var TakeHomeService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "skip.platform.api.TakeHomeService",
+	ServiceName: "api.TakeHomeService",
 	HandlerType: (*TakeHomeServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -193,5 +194,5 @@ var TakeHomeService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/api.proto",
+	Metadata: "api.proto",
 }

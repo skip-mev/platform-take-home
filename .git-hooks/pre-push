@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+echo "Running proto generation before push..."
+make proto
+
+# Stage the generated files
+git add proto/*.pb.go api/types/
+
+# Check if there are any changes
+if ! git diff --cached --quiet; then
+    echo "Proto files were regenerated. Please commit the changes before pushing."
+    git reset  # Unstage the changes
+    exit 1
+fi
+
+exit 0

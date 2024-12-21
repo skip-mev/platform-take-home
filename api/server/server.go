@@ -2,17 +2,19 @@ package server
 
 import (
 	"context"
+	"os"
+
 	"github.com/skip-mev/platform-take-home/api/service"
 	"github.com/skip-mev/platform-take-home/observability/logging"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
-	"os"
+
+	"net"
 
 	"github.com/skip-mev/platform-take-home/api/types"
 	"github.com/skip-mev/platform-take-home/store"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"net"
 )
 
 type Server struct {

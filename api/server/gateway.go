@@ -3,17 +3,19 @@ package server
 import (
 	"context"
 	"errors"
+
 	"github.com/rs/cors"
 	"github.com/skip-mev/platform-take-home/observability/logging"
 	"go.uber.org/zap"
 
 	"fmt"
+	"net"
+	"net/http"
+
 	"github.com/skip-mev/platform-take-home/api/types"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/encoding/protojson"
-	"net"
-	"net/http"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 )
